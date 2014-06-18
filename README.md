@@ -26,7 +26,9 @@ Daisy clustering algorithm applied to the first customer
 > library(cluster)
 
 #Create dissimilarity matrix
-> daisy1 <- daisy(df, metric="gower")
+#Using gower metric for similarity measures
+#Symmetric type of matrix
+> daisy1 <- daisy(df, metric="gower", type = list(symm))
 
 #Pam clustering algorithm
 > pam(daisy1, 3, mediods = NULL) 
