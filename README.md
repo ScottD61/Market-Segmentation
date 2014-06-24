@@ -21,14 +21,12 @@ Daisy clustering algorithm applied to the first customer
 # Fill in missing values b/c no missing values in k-means - normalization
 # Feature scaling
 
-# Daisy package automatically performs standardization
-# Download daisy package
-> library(cluster)
-
+#Daisy package automatically performs standardization
 #Create dissimilarity matrix
-#Using gower metric for similarity measures
-#Symmetric type of matrix
-> daisy1 <- daisy(df, metric="gower", type = list(symm))
+> daisy1 <- daisy(df, metric = "gower", type = list(ordratio = c(1:35))) 
 
-#Pam clustering algorithm
-> pam(daisy1, 3, mediods = NULL) 
+#Load pam cluster package
+> library(pam)
+
+#Pam algorithm with 3 clusters 
+> pam(daisy1, 3, diss = TRUE, mediods = NULL)
