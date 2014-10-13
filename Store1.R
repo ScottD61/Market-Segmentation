@@ -11,7 +11,7 @@ Store1new <- Store1[c(-1,-2,-12,-15,-16,-17,-18,-19,-20,-21,-22,-23,-24,-25,-26,
 #Remove all rows with only NA values
 Store1df <- Store1new[!!rowSums(!is.na(Store1new)),]
 #Convert csv to data.frame
-df <-as.data.frame(Store1df)
+df <- as.data.frame(Store1df)
 #Convert csv to data.frame
 #Save data.frame
 save(df, file = "df.Rda")
@@ -19,18 +19,13 @@ save(df, file = "df.Rda")
 head(df)
 #Info about data.frame
 str(df)
-#Create index of half of df
-#Part1 
-df1a <- df[1:53426,]
-#Part2
-df1b <- df[53427:106852,]
-#Save new dataframes
-save(df1a, file = "df1a.Rda")
-save(df1b, file = "df1b.Rda")
-#Purpose of Clustering
-#Identify feature space for finding structures of features
-#Increase memory size to 70 Gb
-memory.size(max = 70000)
+#Fill in data with mode from histograms
+#Insert mode into NA values
+indx1 <- which(is.na(df), arr.ind=TRUE)
+df[indx1] <- c("25-34", "Male", "50k-75k", "Single",
+               "No", "Own", "150k-200k", "Professional",
+               "Completed High School")[indx1[,2]]
+
 #Import cluster package
 library(cluster)
 #Create dissimilarity matrix
@@ -38,30 +33,17 @@ library(cluster)
 daisy1 <- daisy(df, metric = "gower", type = list(ordratio = c(1:11))) 
 #Pam algorithm with 3 clusters 
 k1answers <- pam(daisy1, 3, diss = TRUE)
-#Evaluate k-mediod clustering algorithm with 2 to 6 clusters
-
-
-#Option 2: CLARA function
-#Exclude dissimilarity matrix
-library(cluster)
-client1.clara <- clara(Store1, 3, metric = "euclidean", stand = FALSE, samples = 100,
-                sampsize = (1331), rngR = FALSE, pamLike = TRUE)
-#Get results
-#Get number in each sample
-client1.clara$sample
-#Get medoids?
-client1.clara$medoids
-#Get each cluster with width and neighbor
-client1.clara$silinfo
-#Create table showing user.id in cluster - WRONG 
-client1table <- table(Store1$userid, client1.clara$cluster)
-#Show results
-client1table
+#Get number of observations per cluster
+k1answers$id.med
+#Information about clusters
+k1answers$clusinfo
+#Group row with cluster
+Groups1 <- k1answers$clustering
 #Coerce object to data.frame
-clust1groups <- as.data.frame(client1table, row.names = NULL)
-#Create .CSV file 
-write.table(client1table, file <- "/Users/scdavis6/Desktop/ClaraClient1Solutions.csv")
-
+clustgroups1 <- as.data.frame(Groups1, row.names = NULL)
+#Create .CSV file
+#Show row number next to cluster
+write.table(clust1groups, file <- "C:/Users/Administrator/Desktop/Solutions1.csv")
 
 #Visualizations
 #histogram Age - DONE
@@ -76,10 +58,10 @@ mtext(text="Age", side=1, line=5)
 mtext(text="Density", side=2, line=5)
 
 
-
 #histogram Gender - DONE
 plot(Store1$Gender, main = "Distribution of Gender Client 1", xlab = "Gender", 
      ylab = "Density", ylim = c(0,60000))
+
 
 #histogram HomeOwnerStatus - DONE
 par(mar=c(5,5,3,1))
@@ -102,14 +84,15 @@ mtext(text="HouseholdIncome", side=1, line=5.5)
 mtext(text="Density", side=2, line=4)
 
 
-
 #histogram of Marital Status - DONE 
 plot(Store1$MaritalStatus, main = "Distribution of Marital Status Client 1", xlab = "Marital Status", 
      ylim = c(0,35000), ylab = "Density")
 
+
 #histogram of prescence of children - DONE 
 plot(Store1$PresenceofChildren, main = "Distribution of Children Prescence Client 1", xlab = "Children Prescence", 
      ylim = c(0,45000), ylab = "Density")
+
 
 #histogram Home Market Value - DONE 
 #Set the order
@@ -125,7 +108,6 @@ plot(res1, main = "Distribution of Home Market Value Client 1",
      xlab = "", ylab = "", las = 2, ylim = c(0,10000))
 mtext(text = "Home Market Value", side = 1, line = 5.5)
 mtext(text = "Density", side = 2, line = 4)
-
 
 
 #histogram Occupation - DONE
@@ -172,25 +154,3 @@ plot(res4, main = "Distribution of Length of Residence Client 1",
      xlab = "", ylab = "", las = 2, ylim = c(0,10000))
 mtext(text = "Length of Residence", side = 1, line = 8)
 mtext(text = "Density", side = 2, line = 3.5)
-
-
-
-#Fill in data with mode from histograms
-#Other method - works 
-indx1 <- which(is.na(df), arr.ind=TRUE)
-df[indx1] <- c("25-34", "Male", "50k-75k", "Single",
-                "No", "Own", "150k-200k", "Professional",
-                "Completed High School")[indx1[,2]]
-
-
-#Get the results
-#Load Data
-Store1 <- read.csv("/Users/scdavis6/Documents/Work/TowerData/Data/Client1.csv", 
-                   na.strings = "", head = TRUE)
-#Clean up titles of data.frame - CORRECT ANSWER FROM FORUM
-names(Store1) <- gsub("_|\\.\\.\\.|\\." , "", names(Store1))
-#Remove other columns
-Store1new <- Store1[c(-15,-16,-17,-18,-19,-20,-21,-22,-23,-24,-25,-26,-27,-28,
-                      -29,-30,-31,-32,-33,-34,-35,-36)] 
-#Remove all rows with only NA values
-Store1df <- Store1new[!!rowSums(!is.na(Store1new)),]

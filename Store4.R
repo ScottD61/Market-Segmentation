@@ -12,6 +12,11 @@ Store4new <- Store4[c(-1,-11,-14,-15,-16,-17,-18,-19,-20,-21,-22,-23,-24,-25,-26
 Store4df <- Store4new[!!rowSums(!is.na(Store4new)),]
 #Convert csv to data.frame
 df4 <- as.data.frame(Store4df)
+#Fill in data with mode from histograms
+indx4 <- which(is.na(df4), arr.ind=TRUE)
+df4[indx4] <- c("55-64", "Female", "150k-175k", "Married",
+                "Yes", "Rent", "500k-1mm", "Professional",
+                "Completed College")[indx4[,2]]
 #Save data.frame
 save(df4,file="df4.Rda")
 #View data.frame
@@ -20,6 +25,7 @@ head(df4)
 str(df4)
 #Write df as csv
 write.table(df4, file = "/Users/scdavis6/Desktop/df4.csv")
+
 #Import cluster package
 library(cluster)
 #Create dissimilarity matrix
@@ -32,33 +38,11 @@ k4answers$id.med
 #Information about clusters
 k4answers$clusinfo
 #Group row with cluster
-Groups4 <- k4answers$silinfo
+Groups4 <- k4answers$clustering
 #Coerce object to data.frame
 clustgroups2 <- as.data.frame(Groups4, row.names = NULL)
 #Create .CSV file
 write.table(clustgroups2, file <- "/Users/scdavis6/Desktop/Solutions4.csv")
-
-
-#Option 2: CLARA function
-#Exclude dissimilarity matrix
-library(cluster)
-client4.clara <- clara(Store4, 3, metric = "euclidean", stand = FALSE, samples = 5,
-                       sampsize = (3000), rngR = FALSE, pamLike = TRUE)
-#Get results
-#Get number in each sample
-client4.clara$sample
-#Get medoids?
-client4.clara$medoids
-#Get each cluster with width and neighbor
-client4.clara$silinfo
-#Create table showing user.id in cluster - WRONG 
-client4table <- table(Store4$email, client4.clara$cluster)
-#Show results
-client4table
-#Coerce object to data.frame
-clust4groups <- as.data.frame(client4table, row.names = NULL)
-#Create .CSV file 
-write.table(client4table, file <- "/Users/scdavis6/Desktop/ClaraClient4Solutions.csv")d
 
 
 #Create visualizations
@@ -74,10 +58,10 @@ mtext(text="Age", side=1, line=4)
 mtext(text="Density", side=2, line=3.5)
 
 
-
 #histogram Gender - done 
 plot(Store4$Gender, main = "Distribution of Gender Client 4", xlab = "Gender", 
      ylab = "Density", ylim = c(0,8000))
+
 
 #histogram HomeOwnerStatus
 plot(Store4$HomeOwnerStatus, main = "Distribution of Home Ownership Client 4", xlab = "Home Ownership", 
@@ -97,14 +81,17 @@ plot(res, main = "Distribution of Household Income Client 4", xlab = "",
 mtext(text="HouseholdIncome", side=1, line=5.5)
 mtext(text="Density", side=2, line=3.5)
 
+
 #histogram of Marital Status - DONE 
 par(mar=c(7,5,4,1))
 plot(Store4$MaritalStatus, main = "Distribution of Marital Status Client 4", xlab = "Marital Status", 
      ylab = "Density", ylim = c(0,6000))
 
+
 #histogram of prescence of children - Done
 plot(Store4$PresenceofChildren, main = "Distribution of Children Prescence Client 4", xlab = "Children Prescence", 
      ylab = "Density", ylim = c(0,10000))
+
 
 #histogram Home Market Value - DONE 
 #Set the order
@@ -165,12 +152,3 @@ plot(res4, main = "Distribution of Length of Residence Client 4",
      xlab = "", ylab = "", las=2, ylim = c(0,2000))
 mtext(text="Length of Residence", side=1, line=7)
 mtext(text="Density", side=2, line=3.5)
-
-
-
-#Fill in data with mode from histograms
-#Other method - works 
-indx4 <- which(is.na(df4), arr.ind=TRUE)
-df4[indx4] <- c("55-64", "Female", "150k-175k", "Married",
-               "Yes", "Rent", "500k-1mm", "Professional",
-               "Completed College")[indx4[,2]]
